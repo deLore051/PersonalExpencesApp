@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 
+
 class NewTransaction extends StatelessWidget {
-  const NewTransaction({super.key});
+  final titleController = TextEditingController();
+  final amountController = TextEditingController();
+  final Function addTransaction;
+
+  NewTransaction(this.addTransaction);
 
   @override
   Widget build(BuildContext context) {
-    final titleController = TextEditingController();
-    final amountController = TextEditingController();
-    
     return Card(
             elevation: 5,
             child: Container(
@@ -30,8 +32,10 @@ class NewTransaction extends StatelessWidget {
                   TextButton(
                     child: Text("Add Transaction"),
                     onPressed: () {
-                      print(titleController.text);
-                      print(amountController.text);
+                      addTransaction(
+                        titleController.text, 
+                        double.parse(amountController.text)
+                      );
                     }, 
                   ),
                 ],

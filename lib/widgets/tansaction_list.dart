@@ -1,39 +1,28 @@
-import 'package:expences_app/models/transaction.dart';
-import 'package:flutter/cupertino.dart';
-import 'package:flutter/src/widgets/framework.dart';
+import '../models/transaction.dart';
+import './user_transactions.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class TransactionList extends StatefulWidget {
-  const TransactionList({super.key});
+class TransactionList extends StatelessWidget {
+  
+  final List<Transaction> transactions;
 
-  @override
-  State<TransactionList> createState() => _TransactionListState();
-}
-
-class _TransactionListState extends State<TransactionList> {
-
-  final List<Transaction> _userTransactions = [
-    Transaction(
-      id: 't1', 
-      title: "New Shoes", 
-      amount: 69.99, 
-      date: DateTime.now()
-    ),
-    Transaction(
-      id: 't2', 
-      title: "Weekly Groceries", 
-      amount: 16.53, 
-      date: DateTime.now()
-    ),
-  ];
+  TransactionList(this.transactions);
 
   @override
   Widget build(BuildContext context) {
     return Container(
             width: double.infinity,
-            child: Column(
-              children: _userTransactions.map((tx) {
+            height: 300,
+            /* There are two types of ListView(children: []), one where we pass the
+              lists children as an argument, and a ListView.builder(). The main difference
+              between the two is that ListView(children: []) renders all the children of
+              the list even those that are invisible at the moment, but the ListView.builder()
+              renders only the children we can see on the screen and maybe a few more for
+              buffering purposes which is of great help when we are working with large
+              lists or lists for which we dont know the number of elements. */
+            child: ListView.builder(
+              itemBuilder: (buildContext, index) {
                 return Card(
                   child: Row(
                     children: <Widget>[
@@ -54,7 +43,7 @@ class _TransactionListState extends State<TransactionList> {
                           ),
                         ),
                         child: Text(
-                          "\$${tx.amount}",
+                          "\$${transactions[index].amount}",
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
@@ -66,14 +55,14 @@ class _TransactionListState extends State<TransactionList> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
-                            tx.title,
+                            transactions[index].title,
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                           Text(
-                            DateFormat("dd/MM/yyyy").format(tx.date),
+                            DateFormat("dd/MM/yyyy").format(transactions[index].date),
                             style: TextStyle(
                               color: Colors.black54
                             ),
@@ -83,7 +72,8 @@ class _TransactionListState extends State<TransactionList> {
                     ],
                   )
                 );
-              }).toList(),
+              },
+              itemCount: transactions.length,
             ),
           );
   }
