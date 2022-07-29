@@ -1,7 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import './widgets/new_transactions.dart';
 import './widgets/tansaction_list.dart';
-import './widgets/user_transactions.dart';
+import './models/transaction.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,23 +17,86 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Personal Expences',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.purple,
+        colorScheme: ColorScheme(
+          brightness: Brightness.light,
+          primary: Colors.purple, 
+          onPrimary: Colors.purpleAccent,
+          secondary: Colors.amber,
+          onSecondary: Colors.amberAccent,
+          error: Colors.red,
+          onError: Colors.redAccent,
+          background: Colors.white,
+          onBackground: Colors.white60,
+          surface: Colors.yellow.shade50,
+          onSurface: Colors.yellow.shade100,
+        ),
       ),
       home: MyHomePage(),
     );
   }
 }
 
-class MyHomePage extends StatelessWidget {
+class MyHomePage extends StatefulWidget {
 
-  final titleController = TextEditingController();
-  final amountController = TextEditingController();
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  final List<Transaction> _userTransactions = [
+    Transaction(
+      id: 't1', 
+      title: "New Shoes", 
+      amount: 69.99, 
+      date: DateTime.now()
+    ),
+    Transaction(
+      id: 't2', 
+      title: "Weekly Groceries", 
+      amount: 16.53, 
+      date: DateTime.now()
+    ),
+  ];
+
+  /* We put underscore in front of the methods, functions or parameters
+    name so that we mark it as private. */
+  void _addNewTransaction(String txTitle, double txAmount) {
+    final newTransaction = Transaction(
+      id: Random().nextInt(1000).toString(), 
+      title: txTitle, 
+      amount: txAmount, 
+      date: DateTime.now()
+    );
+
+    /* We call a setState function to refresh the user interface and
+      we can do it here because we are working with statefull widget. */ 
+    setState(() {
+      _userTransactions.add(newTransaction);
+    });
+  }
+
+  // Shows pop up form for adding a new transaction
+  void _showAddNewTransaction(BuildContext ctx) {
+    showModalBottomSheet(
+      context: ctx, 
+      builder: (_) {
+        return NewTransaction(_addNewTransaction);
+      }
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-      title: Text("FlutterApp"),
+        title: Text("Personal Expences"),
+        actions: <Widget>[
+          IconButton( 
+            icon: Icon(Icons.add),
+            onPressed: () => _showAddNewTransaction(context),
+          )
+        ],
       ),
       /* SingleChildScrollView makes our element srollable, in our
         case we had to add it on the body level so it takes the
@@ -60,9 +125,14 @@ class MyHomePage extends StatelessWidget {
                   color: Colors.blue
                 ),
               ),
-              UserTransactions(),
+              TransactionList(_userTransactions),
             ],
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: FloatingActionButton(
+        child: Icon(Icons.add),
+        onPressed: () => _showAddNewTransaction(context),
       ),
     );
   }
