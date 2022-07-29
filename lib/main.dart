@@ -18,19 +18,31 @@ class MyApp extends StatelessWidget {
       title: 'Personal Expences',
       theme: ThemeData(
         primarySwatch: Colors.purple,
-        colorScheme: ColorScheme(
-          brightness: Brightness.light,
-          primary: Colors.purple, 
-          onPrimary: Colors.purpleAccent,
-          secondary: Colors.amber,
-          onSecondary: Colors.amberAccent,
-          error: Colors.red,
-          onError: Colors.redAccent,
-          background: Colors.white,
-          onBackground: Colors.white60,
-          surface: Colors.yellow.shade50,
-          onSurface: Colors.yellow.shade100,
+        fontFamily: "Quicksand",
+        appBarTheme: AppBarTheme(
+          titleTextStyle: TextStyle(
+            fontFamily: "OpenSans",
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
         ),
+        textTheme: ThemeData.light().textTheme.copyWith(
+          titleSmall: TextStyle(
+            fontFamily: "OpenSans",
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+          titleMedium: TextStyle(
+            fontFamily: "OpenSans",
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+          titleLarge: TextStyle(
+            fontFamily: "OpenSans",
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          )
+        ) 
       ),
       home: MyHomePage(),
     );
