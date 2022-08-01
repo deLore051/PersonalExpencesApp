@@ -20,7 +20,24 @@ class TransactionList extends StatelessWidget {
               renders only the children we can see on the screen and maybe a few more for
               buffering purposes which is of great help when we are working with large
               lists or lists for which we dont know the number of elements. */
-            child: ListView.builder(
+            child: transactions.isEmpty ? Column(
+              children: [
+                Text(
+                  "No transactions added yet!!!",
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+                SizedBox(
+                  height: 10,
+                  width: double.infinity,
+                ),
+                Container(
+                  height: 200,
+                  child: Image.asset(
+                    "assets/images/waiting.png",
+                  ),
+                ),
+              ],
+            ) : ListView.builder(
               itemBuilder: (buildContext, index) {
                 return Card(
                   child: Row(

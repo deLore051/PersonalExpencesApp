@@ -1,9 +1,11 @@
+import 'dart:ffi';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
 import './widgets/new_transactions.dart';
 import './widgets/tansaction_list.dart';
 import './models/transaction.dart';
+import './widgets/chart.dart';
 
 void main() {
   runApp(const MyApp());
@@ -57,19 +59,33 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [
-    Transaction(
-      id: 't1', 
-      title: "New Shoes", 
-      amount: 69.99, 
-      date: DateTime.now()
-    ),
-    Transaction(
-      id: 't2', 
-      title: "Weekly Groceries", 
-      amount: 16.53, 
-      date: DateTime.now()
-    ),
+    // Transaction(
+    //   id: 't1', 
+    //   title: "New Shoes", 
+    //   amount: 69.99, 
+    //   date: DateTime.now()
+    // ),
+    // Transaction(
+    //   id: 't2', 
+    //   title: "Weekly Groceries", 
+    //   amount: 16.53, 
+    //   date: DateTime.now()
+    // ),
   ];
+
+  List<Transaction> get _recentTransactions {
+    /* .where() method is used to run a function on every item in a list and if that function
+      returnes true that item is kept in a newly returned list otherwise its not included in the
+      newly returned list.  */
+    return _userTransactions.where((tx) {
+      return tx.date.isAfter(
+        DateTime.now().subtract(
+          Duration(days: 7),
+        ),
+      );
+    }).toList();
+    
+  }
 
   /* We put underscore in front of the methods, functions or parameters
     name so that we mark it as private. */
@@ -127,16 +143,8 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: double.infinity,
-                height: 50,
-                child: Card(
-                  child: Text("Chart"),
-                  elevation: 5,
-                  color: Colors.blue
-                ),
-              ),
+            children: <Widget>[
+              Chart(_recentTransactions),
               TransactionList(_userTransactions),
             ],
         ),
