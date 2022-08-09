@@ -13,7 +13,7 @@ class TransactionList extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
             width: double.infinity,
-            height: MediaQuery.of(context).size.height * 0.8,
+            height: 450,
             /* There are two types of ListView(children: []), one where we pass the
               lists children as an argument, and a ListView.builder(). The main difference
               between the two is that ListView(children: []) renders all the children of
