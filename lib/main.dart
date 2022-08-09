@@ -43,8 +43,8 @@ class MyApp extends StatelessWidget {
             fontFamily: "OpenSans",
             fontSize: 24,
             fontWeight: FontWeight.bold,
-          )
-        ) 
+          ),
+        ), 
       ),
       home: MyHomePage(),
     );
