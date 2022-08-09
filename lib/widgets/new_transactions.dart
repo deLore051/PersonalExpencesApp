@@ -14,19 +14,23 @@ class NewTransaction extends StatefulWidget {
 class _NewTransactionState extends State<NewTransaction> {
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
-  late DateTime _selectedDate;
+  DateTime? _selectedDate;
 
   void _submitData() {
+    if(_titleController.text.isEmpty || _amountController.text.isEmpty) {
+      return;
+    }
+
     final enteredTitle = _titleController.text;
     final enteredAmount = double.parse(_amountController.text);
 
-    if(enteredTitle.isEmpty || enteredAmount <= 0) {
+    if(enteredTitle.isEmpty || enteredAmount <= 0 || _selectedDate == null) {
       return;
     }
 
     /* Widget method is a special property that gives us access to the class of our widget
       and its methods and properties */
-    widget.addTransaction(enteredTitle, enteredAmount);
+    widget.addTransaction(enteredTitle, enteredAmount, _selectedDate);
     
     /* Used to close the pop-up form after we add the transaction. Context property is also
       a special property that gives us access to the content related to our widget. */
@@ -52,7 +56,9 @@ class _NewTransactionState extends State<NewTransaction> {
       if(pickedDate == null) {
         return;
       } else {
-        _selectedDate = pickedDate;
+        setState(() {
+          _selectedDate = pickedDate;
+        });
       }
     });
   }
@@ -89,11 +95,15 @@ class _NewTransactionState extends State<NewTransaction> {
                     width: double.infinity,
                     child: Row(
                       children: <Widget>[
-                        Text(
-                          _selectedDate == null ? "No date chosen!" : DateFormat("dd/MM/yyyy").format(_selectedDate),
+                        Expanded(
+                          child: Text(
+                          _selectedDate == null 
+                          ? "No date chosen!" 
+                          : "Picked date: ${DateFormat("dd/MM/yyyy").format(_selectedDate!)}",
                           style: TextStyle(
                             fontSize: 16,
                           ),
+                        ),
                         ),
                         TextButton(
                           style: ButtonStyle(

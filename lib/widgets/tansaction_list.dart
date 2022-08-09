@@ -5,14 +5,15 @@ import 'package:intl/intl.dart';
 class TransactionList extends StatelessWidget {
   
   final List<Transaction> transactions;
+  final Function deleteTransaction;
 
-  TransactionList(this.transactions);
+  TransactionList(this.transactions, this.deleteTransaction);
 
   @override
   Widget build(BuildContext context) {
     return Container(
             width: double.infinity,
-            height: 300,
+            height: MediaQuery.of(context).size.height * 0.8,
             /* There are two types of ListView(children: []), one where we pass the
               lists children as an argument, and a ListView.builder(). The main difference
               between the two is that ListView(children: []) renders all the children of
@@ -38,6 +39,7 @@ class TransactionList extends StatelessWidget {
                 ),
               ],
             ) : ListView.builder(
+              shrinkWrap: true,
               itemBuilder: (buildContext, index) {
                 return Card(
                   color: Colors.grey.shade50,
@@ -61,6 +63,13 @@ class TransactionList extends StatelessWidget {
                       style: Theme.of(context).textTheme.titleMedium,
                     ),
                     subtitle: Text(DateFormat("dd/MM/yyyy").format(transactions[index].date)),
+                    trailing: IconButton(
+                      onPressed: () {
+                        return deleteTransaction(transactions[index].id);
+                      }, 
+                      icon: Icon(Icons.delete),
+                      color: Theme.of(context).errorColor,
+                    ),
                   ),
                 );
               },

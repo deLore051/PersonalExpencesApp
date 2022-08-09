@@ -58,20 +58,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  final List<Transaction> _userTransactions = [
-    // Transaction(
-    //   id: 't1', 
-    //   title: "New Shoes", 
-    //   amount: 69.99, 
-    //   date: DateTime.now()
-    // ),
-    // Transaction(
-    //   id: 't2', 
-    //   title: "Weekly Groceries", 
-    //   amount: 16.53, 
-    //   date: DateTime.now()
-    // ),
-  ];
+  final List<Transaction> _userTransactions = [];
 
   List<Transaction> get _recentTransactions {
     /* .where() method is used to run a function on every item in a list and if that function
@@ -89,18 +76,26 @@ class _MyHomePageState extends State<MyHomePage> {
 
   /* We put underscore in front of the methods, functions or parameters
     name so that we mark it as private. */
-  void _addNewTransaction(String txTitle, double txAmount) {
+  void _addNewTransaction(String txTitle, double txAmount, DateTime chosenDate) {
     final newTransaction = Transaction(
       id: Random().nextInt(1000).toString(), 
       title: txTitle, 
       amount: txAmount, 
-      date: DateTime.now()
+      date: chosenDate,
     );
 
     /* We call a setState function to refresh the user interface and
       we can do it here because we are working with statefull widget. */ 
     setState(() {
       _userTransactions.add(newTransaction);
+    });
+  }
+
+  void _deleteTransaction(String id) {
+    setState(() {
+      _userTransactions.removeWhere((transaction) {
+        return transaction.id == id;
+      });
     });
   }
 
@@ -145,7 +140,10 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Chart(_recentTransactions),
-              TransactionList(_userTransactions),
+              TransactionList(
+                  _userTransactions, 
+                  _deleteTransaction
+              ),
             ],
         ),
       ),
