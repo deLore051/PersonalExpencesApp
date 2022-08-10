@@ -8,6 +8,12 @@ import './models/transaction.dart';
 import './widgets/chart.dart';
 
 void main() {
+  /* If we want to only enable portrait mode for our app we will use the following code:
+    WidgetsFlutterBinding.ensureInitialized();
+    SystemChrome.setPreferredOrientations(
+      DeviceOrientation.protraitUp,
+      DeviceOrientation.portraitDown,
+    ) */
   runApp(const MyApp());
 }
 
@@ -59,6 +65,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   final List<Transaction> _userTransactions = [];
+  bool _showChart = false;
 
   List<Transaction> get _recentTransactions {
     /* .where() method is used to run a function on every item in a list and if that function
@@ -111,16 +118,24 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
+    final appBar = AppBar(
+      title: Text("Personal Expences"),
+      actions: <Widget>[
+        IconButton( 
+          icon: Icon(Icons.add),
+          onPressed: () => _showAddNewTransaction(context),
+        )
+      ],
+    );
+    final transactionListWidget = Container(
+      height: (MediaQuery.of(context).size.height -
+                appBar.preferredSize.height -
+                MediaQuery.of(context).padding.top) * 0.7,
+      child: TransactionList(_userTransactions, _deleteTransaction)
+    );
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Personal Expences"),
-        actions: <Widget>[
-          IconButton( 
-            icon: Icon(Icons.add),
-            onPressed: () => _showAddNewTransaction(context),
-          )
-        ],
-      ),
+      appBar: appBar,
       /* SingleChildScrollView makes our element srollable, in our
         case we had to add it on the body level so it takes the
         whole area that body takes as scrollable. It wouldnt work
@@ -139,12 +154,43 @@ class _MyHomePageState extends State<MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Chart(_recentTransactions),
-              TransactionList(
-                  _userTransactions, 
-                  _deleteTransaction
+              if(isLandscape) Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Show Chart"),
+                  Switch(
+                    value: _showChart, 
+                    onChanged: (val) {
+                      setState(() {
+                        _showChart = val;
+                      });
+                    },
+                  ),
+                ],
               ),
-            ],
+              /* To dynamically calculate the height of our elements, the chart and transaction list we need
+                to get the height of the screen for the device with MediaQuery.of(context).size.height, after
+                that we need to subract the height of the appBar (which we get with appBar.preferedSize.height)
+                and the height of the status bar on top of the screen which is set automatically so our app
+                doesnt cover the status bar (we get it with MediaQuery.of(context).padding.top) the result of
+                that we multiply with a value from 0 to 1 ( 1 representing the full height of the screen) to
+                get the desired height we want to allocate to the widgets shown on screen. */
+              if(!isLandscape) Container(
+                    height: (MediaQuery.of(context).size.height -
+                            appBar.preferredSize.height -
+                            MediaQuery.of(context).padding.top) * 0.3,
+                    child: Chart(_recentTransactions)
+                  ),
+              if(!isLandscape) transactionListWidget,
+              if(isLandscape) _showChart
+                ? Container(
+                    height: (MediaQuery.of(context).size.height -
+                            appBar.preferredSize.height -
+                            MediaQuery.of(context).padding.top) * 0.6,
+                    child: Chart(_recentTransactions)
+                  )
+                : transactionListWidget
+          ],
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
@@ -155,4 +201,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-
