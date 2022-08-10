@@ -109,7 +109,8 @@ class _MyHomePageState extends State<MyHomePage> {
   // Shows pop up form for adding a new transaction
   void _showAddNewTransaction(BuildContext ctx) {
     showModalBottomSheet(
-      context: ctx, 
+      context: ctx,
+      isScrollControlled: true, 
       builder: (_) {
         return NewTransaction(_addNewTransaction);
       }

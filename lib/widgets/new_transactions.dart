@@ -65,83 +65,90 @@ class _NewTransactionState extends State<NewTransaction> {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-            elevation: 5,
-            child: Container(
-              padding: EdgeInsets.all(10),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: "Title"
+    return SingleChildScrollView(
+      child: Card(
+              elevation: 5,
+              child: Container(
+                padding: EdgeInsets.only(
+                  left: 10, 
+                  top: 10, 
+                  right: 10, 
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 10
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: <Widget>[
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: "Title"
+                      ),
+                      controller: _titleController,
                     ),
-                    controller: _titleController,
-                  ),
-                  TextField(
-                    decoration: InputDecoration(
-                      labelText: "Amount"
+                    TextField(
+                      decoration: InputDecoration(
+                        labelText: "Amount"
+                      ),
+                      keyboardType: TextInputType.number,
+                      controller: _amountController,
+                      /* The on submitted takes a Function with a string value as a paameter so
+                        we eather have to add a String parameter in submitData or in our case
+                        make an annonymous function and put an _ as a parameter because we wont
+                        use this parameter someware else, so we dont care how its called. */
+                      onSubmitted: (_) => _submitData(),
                     ),
-                    keyboardType: TextInputType.number,
-                    controller: _amountController,
-                    /* The on submitted takes a Function with a string value as a paameter so
-                      we eather have to add a String parameter in submitData or in our case
-                      make an annonymous function and put an _ as a parameter because we wont
-                      use this parameter someware else, so we dont care how its called. */
-                    onSubmitted: (_) => _submitData(),
-                  ),
-                  Container(
-                    height: 70,
-                    width: double.infinity,
-                    child: Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Text(
-                          _selectedDate == null 
-                          ? "No date chosen!" 
-                          : "Picked date: ${DateFormat("dd/MM/yyyy").format(_selectedDate!)}",
-                          style: TextStyle(
-                            fontSize: 16,
-                          ),
-                        ),
-                        ),
-                        TextButton(
-                          style: ButtonStyle(
-                            foregroundColor: MaterialStateProperty.all<Color>(
-                              Theme.of(context).primaryColor,
-                            ),
-                          ),
-                          onPressed: _presentDatePicker, 
-                          child: Text(
-                            "Chose date",
+                    Container(
+                      height: 70,
+                      width: double.infinity,
+                      child: Row(
+                        children: <Widget>[
+                          Expanded(
+                            child: Text(
+                            _selectedDate == null 
+                            ? "No date chosen!" 
+                            : "Picked date: ${DateFormat("dd/MM/yyyy").format(_selectedDate!)}",
                             style: TextStyle(
                               fontSize: 16,
-                              fontWeight: FontWeight.bold
                             ),
                           ),
+                          ),
+                          TextButton(
+                            style: ButtonStyle(
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            onPressed: _presentDatePicker, 
+                            child: Text(
+                              "Chose date",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    TextButton(
+                      style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(
+                          Theme.of(context).primaryColor
                         ),
-                      ],
-                    ),
-                  ),
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        Theme.of(context).primaryColor
                       ),
-                    ),
-                    child: Text(
-                      "Add Transaction",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                      child: Text(
+                        "Add Transaction",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
+                      onPressed: _submitData, 
                     ),
-                    onPressed: _submitData, 
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          );
+    );
   }
 }
