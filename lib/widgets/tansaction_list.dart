@@ -11,6 +11,7 @@ class TransactionList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mediaQuerry = MediaQuery.of(context);
     /* There are two types of ListView(children: []), one where we pass the
       lists children as an argument, and a ListView.builder(). The main difference
       between the two is that ListView(children: []) renders all the children of
@@ -64,7 +65,7 @@ class TransactionList extends StatelessWidget {
                   subtitle: Text(
                     DateFormat("dd/MM/yyyy").format(transactions[index].date)
                   ),
-                  trailing: MediaQuery.of(context).size.width > 360
+                  trailing: mediaQuerry.size.width > 360
                       ? TextButton.icon(
                           onPressed: () => deleteTransaction(transactions[index].id), 
                           icon: Icon(Icons.delete), 

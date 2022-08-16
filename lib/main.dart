@@ -1,11 +1,14 @@
 import 'dart:ffi';
 import 'dart:math';
+import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import './widgets/new_transactions.dart';
 import './widgets/tansaction_list.dart';
 import './models/transaction.dart';
 import './widgets/chart.dart';
+
 
 void main() {
   /* If we want to only enable portrait mode for our app we will use the following code:
@@ -119,25 +122,101 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final bool isLandscape = MediaQuery.of(context).orientation == Orientation.landscape;
-    final appBar = AppBar(
-      title: Text("Personal Expences"),
-      actions: <Widget>[
-        IconButton( 
-          icon: Icon(Icons.add),
-          onPressed: () => _showAddNewTransaction(context),
-        )
-      ],
-    );
+    final mediaQuerry = MediaQuery.of(context);
+    final bool isLandscape = mediaQuerry.orientation == Orientation.landscape;
+    final dynamic appBar = Platform.isIOS 
+        ? CupertinoNavigationBar(
+          middle: Text("Personal Expences"),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              CupertinoButton(
+                child: Icon(CupertinoIcons.add), 
+                onPressed: () => _showAddNewTransaction(context)
+              )
+            ],
+          ),
+        ) 
+        : AppBar(
+          title: Text("Personal Expences"),
+          actions: <Widget>[
+            IconButton( 
+              icon: Icon(Icons.add),
+              onPressed: () => _showAddNewTransaction(context),
+            )
+          ],
+        );
+
     final transactionListWidget = Container(
-      height: (MediaQuery.of(context).size.height -
-                appBar.preferredSize.height -
-                MediaQuery.of(context).padding.top) * 0.7,
+      height: (mediaQuerry.size.height - appBar.preferredSize.height - mediaQuerry.padding.top) * 0.7,
       child: TransactionList(_userTransactions, _deleteTransaction)
     );
-    return Scaffold(
-      appBar: appBar,
-      /* SingleChildScrollView makes our element srollable, in our
+
+    final pageBody = SafeArea(
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            if (isLandscape)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "Show Chart",
+                    style: Theme.of(context).textTheme.titleMedium,
+                  ),
+                  /* The adaptive is a special constructor that is available for some widgets, in this
+                    case the Switch.adaptive() takes the same parameters as a normal Switch but it 
+                    detects on which platform is the app running and changes its look for that platform */
+                  Switch.adaptive(
+                    activeColor: Theme.of(context).primaryColor,
+                    value: _showChart,
+                    onChanged: (val) {
+                      setState(() {
+                        _showChart = val;
+                      });
+                    },
+                  ),
+                ],
+              ),
+            /* To dynamically calculate the height of our elements, the chart and transaction list we need
+                to get the height of the screen for the device with MediaQuery.of(context).size.height, after
+                that we need to subract the height of the appBar (which we get with appBar.preferedSize.height)
+                and the height of the status bar on top of the screen which is set automatically so our app
+                doesnt cover the status bar (we get it with MediaQuery.of(context).padding.top) the result of
+                that we multiply with a value from 0 to 1 ( 1 representing the full height of the screen) to
+                get the desired height we want to allocate to the widgets shown on screen. */
+            if (!isLandscape)
+              Container(
+                  height: (mediaQuerry.size.height -
+                          appBar.preferredSize.height -
+                          mediaQuerry.padding.top) *
+                      0.3,
+                  child: Chart(_recentTransactions)),
+            if (!isLandscape) transactionListWidget,
+            if (isLandscape)
+              _showChart
+                  ? Container(
+                      height: (mediaQuerry.size.height -
+                              appBar.preferredSize.height -
+                              mediaQuerry.padding.top) *
+                          0.6,
+                      child: Chart(_recentTransactions))
+                  : transactionListWidget
+          ],
+        ),
+      ),
+    );
+            
+    return Platform.isIOS
+        ? CupertinoPageScaffold(
+            child: pageBody,
+            navigationBar: appBar,
+          )
+        : Scaffold(
+            appBar: appBar,
+            /* SingleChildScrollView makes our element srollable, in our
         case we had to add it on the body level so it takes the
         whole area that body takes as scrollable. It wouldnt work
         if we added it only at UserTransactions(), Column ... level
@@ -150,55 +229,18 @@ class _MyHomePageState extends State<MyHomePage> {
         make it scrollable, but we will stil get the error view on the
         simulator when our keyboard pops up because the view bellow it
         will not where to move. */
-      body: SingleChildScrollView(
-        child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              if(isLandscape) Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text("Show Chart"),
-                  Switch(
-                    value: _showChart, 
-                    onChanged: (val) {
-                      setState(() {
-                        _showChart = val;
-                      });
-                    },
+            body: pageBody,
+            floatingActionButtonLocation:
+                FloatingActionButtonLocation.centerFloat,
+            /* With Platform.isIOS we check if the current platform is iOS and if it is we dont render the
+      floatingActionButton but instead we render an empty container because its not a normal iOS
+      pattern that is used when making an app for iOS devices. */
+            floatingActionButton: Platform.isIOS
+                ? Container()
+                : FloatingActionButton(
+                    child: Icon(Icons.add),
+                    onPressed: () => _showAddNewTransaction(context),
                   ),
-                ],
-              ),
-              /* To dynamically calculate the height of our elements, the chart and transaction list we need
-                to get the height of the screen for the device with MediaQuery.of(context).size.height, after
-                that we need to subract the height of the appBar (which we get with appBar.preferedSize.height)
-                and the height of the status bar on top of the screen which is set automatically so our app
-                doesnt cover the status bar (we get it with MediaQuery.of(context).padding.top) the result of
-                that we multiply with a value from 0 to 1 ( 1 representing the full height of the screen) to
-                get the desired height we want to allocate to the widgets shown on screen. */
-              if(!isLandscape) Container(
-                    height: (MediaQuery.of(context).size.height -
-                            appBar.preferredSize.height -
-                            MediaQuery.of(context).padding.top) * 0.3,
-                    child: Chart(_recentTransactions)
-                  ),
-              if(!isLandscape) transactionListWidget,
-              if(isLandscape) _showChart
-                ? Container(
-                    height: (MediaQuery.of(context).size.height -
-                            appBar.preferredSize.height -
-                            MediaQuery.of(context).padding.top) * 0.6,
-                    child: Chart(_recentTransactions)
-                  )
-                : transactionListWidget
-          ],
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-      floatingActionButton: FloatingActionButton(
-        child: Icon(Icons.add),
-        onPressed: () => _showAddNewTransaction(context),
-      ),
-    );
+          );
   }
 }

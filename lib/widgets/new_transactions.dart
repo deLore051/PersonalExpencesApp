@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -111,44 +114,54 @@ class _NewTransactionState extends State<NewTransaction> {
                             ),
                           ),
                           ),
-                          TextButton(
+                          Platform.isIOS
+                        ? CupertinoButton(
+                          child: Text(
+                              "Chose date",
+                              style: TextStyle(
+                                  fontSize: 16, 
+                                  fontWeight: FontWeight.bold
+                                ),
+                            ),
+                          onPressed: _presentDatePicker,
+                        )
+                        : TextButton(
                             style: ButtonStyle(
                               foregroundColor: MaterialStateProperty.all<Color>(
                                 Theme.of(context).primaryColor,
                               ),
                             ),
-                            onPressed: _presentDatePicker, 
+                            onPressed: _presentDatePicker,
                             child: Text(
                               "Chose date",
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold
-                              ),
+                                  fontSize: 16, 
+                                  fontWeight: FontWeight.bold
+                                ),
                             ),
                           ),
-                        ],
-                      ),
-                    ),
-                    TextButton(
-                      style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(
-                          Theme.of(context).primaryColor
-                        ),
-                      ),
-                      child: Text(
-                        "Add Transaction",
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      onPressed: _submitData, 
-                    ),
                   ],
                 ),
               ),
-            ),
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all<Color>(
+                      Theme.of(context).primaryColor),
+                ),
+                child: Text(
+                  "Add Transaction",
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+                onPressed: _submitData,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
